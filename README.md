@@ -3,6 +3,10 @@ cache2go
 
 Concurrency-safe golang caching library with expiration capabilities.
 
+## Update Info
+基于cache2go，对其的自动续期功能进行了修改。
+让用户设置cache之时，可以选择缓存是否有自动延期功能。
+
 ## Installation
 
 Make sure you have a working Go environment (Go 1.2 or higher is required).
