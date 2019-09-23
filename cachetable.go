@@ -198,8 +198,8 @@ func (table *CacheTable) addInternal(item *CacheItem) {
 // Parameter lifeSpan determines after which time period without an access the item
 // will get removed from the cache.
 // Parameter data is the item's value.
-func (table *CacheTable) Add(key interface{}, lifeSpan time.Duration, data interface{}) *CacheItem {
-	item := NewCacheItem(key, lifeSpan, data)
+func (table *CacheTable) Add(key interface{}, lifeSpan time.Duration, data interface{}, isAuto bool) *CacheItem {
+	item := NewCacheItem(key, lifeSpan, data, isAuto)
 
 	// Add item to cache.
 	table.Lock()
@@ -261,7 +261,7 @@ func (table *CacheTable) Exists(key interface{}) bool {
 
 // NotFoundAdd checks whether an item is not yet cached. Unlike the Exists
 // method this also adds data if the key could not be found.
-func (table *CacheTable) NotFoundAdd(key interface{}, lifeSpan time.Duration, data interface{}) bool {
+func (table *CacheTable) NotFoundAdd(key interface{}, lifeSpan time.Duration, data interface{}, isAuto bool) bool {
 	table.Lock()
 
 	if _, ok := table.items[key]; ok {
@@ -269,7 +269,7 @@ func (table *CacheTable) NotFoundAdd(key interface{}, lifeSpan time.Duration, da
 		return false
 	}
 
-	item := NewCacheItem(key, lifeSpan, data)
+	item := NewCacheItem(key, lifeSpan, data, isAuto)
 	table.addInternal(item)
 
 	return true
@@ -293,7 +293,7 @@ func (table *CacheTable) Value(key interface{}, args ...interface{}) (*CacheItem
 	if loadData != nil {
 		item := loadData(key, args...)
 		if item != nil {
-			table.Add(key, item.lifeSpan, item.data)
+			table.Add(key, item.lifeSpan, item.data, item.isAutoKeepAlive)
 			return item, nil
 		}
 

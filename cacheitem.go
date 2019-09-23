@@ -48,7 +48,7 @@ func NewCacheItem(key interface{}, lifeSpan time.Duration, data interface{}, isA
 	return &CacheItem{
 		key:           key,
 		lifeSpan:      lifeSpan,
-		isAutoKeepAlive isAuto,
+		isAutoKeepAlive: isAuto,
 		createdOn:     t,
 		accessedOn:    t,
 		accessCount:   0,
