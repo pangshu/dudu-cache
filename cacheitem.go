@@ -23,6 +23,9 @@ type CacheItem struct {
 	data interface{}
 	// How long will the item live in the cache when not being accessed/kept alive.
 	lifeSpan time.Duration
+	
+	//增加是否自动续期
+	isAutoKeepAlive bool
 
 	// Creation timestamp.
 	createdOn time.Time
@@ -40,11 +43,12 @@ type CacheItem struct {
 // Parameter lifeSpan determines after which time period without an access the item
 // will get removed from the cache.
 // Parameter data is the item's value.
-func NewCacheItem(key interface{}, lifeSpan time.Duration, data interface{}) *CacheItem {
+func NewCacheItem(key interface{}, lifeSpan time.Duration, data interface{}, isAuto bool) *CacheItem {
 	t := time.Now()
 	return &CacheItem{
 		key:           key,
 		lifeSpan:      lifeSpan,
+		isAutoKeepAlive isAuto,
 		createdOn:     t,
 		accessedOn:    t,
 		accessCount:   0,
@@ -57,8 +61,15 @@ func NewCacheItem(key interface{}, lifeSpan time.Duration, data interface{}) *Ca
 func (item *CacheItem) KeepAlive() {
 	item.Lock()
 	defer item.Unlock()
-	item.accessedOn = time.Now()
-	item.accessCount++
+	if item.isAutoKeepAlive {
+		item.accessedOn = time.Now()
+		item.accessCount++
+	}
+}
+
+// LifeSpan returns this item's expiration duration.
+func (item *CacheItem) IsAutoKeepAlive() bool {
+	return item.isAutoKeepAlive
 }
 
 // LifeSpan returns this item's expiration duration.
